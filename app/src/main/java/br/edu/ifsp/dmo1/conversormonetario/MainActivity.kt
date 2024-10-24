@@ -1,20 +1,80 @@
 package br.edu.ifsp.dmo1.conversormonetario
 
 import android.os.Bundle
+import android.view.View
+import android.view.View.OnClickListener
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.textfield.TextInputEditText
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
+
+    private val DOLLAR_VALUE = 5.50;
+
+    private lateinit var inputEditText: EditText
+    private lateinit var toDollarButton: Button
+    private lateinit var toRealButton: Button
+    private lateinit var outputTextView: TextView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        findById();
+        configClickListener();
+    }
+
+    override fun onClick(v: View) {
+        if (v == toDollarButton) {
+            dollarConversion();
+        }
+        else if(v == toRealButton) {
+            realConversion();
         }
     }
+
+    private fun findById()
+    {
+        inputEditText = findViewById(R.id.edittext_value);
+        toDollarButton = findViewById(R.id.button_convert_to_dolar);
+        toRealButton = findViewById(R.id.button_convert_to_real);
+        outputTextView = findViewById(R.id.textview_output);
+    }
+
+    private fun configClickListener()
+    {
+        toRealButton.setOnClickListener(this);
+        toDollarButton.setOnClickListener(this);
+    }
+
+    private fun getValue(): Double{
+        return try{
+            inputEditText.text.toString().toDouble()
+        }
+        catch (e: NumberFormatException){
+            0.0
+        }
+    }
+
+    private fun dollarConversion()
+    {
+        var value = getValue();
+        value = value / DOLLAR_VALUE;
+        outputTextView.text = "U$ $value";
+    }
+
+    private fun realConversion()
+    {
+        var value = getValue();
+        value = value * DOLLAR_VALUE;
+        outputTextView.text = "R$ $value";
+    }
+
 }
